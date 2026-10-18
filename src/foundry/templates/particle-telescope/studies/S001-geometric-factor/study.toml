@@ -1,0 +1,10 @@
+title = "Geometric factor (analytic, two discs)"
+task = "script"
+verifies = ["SYS-002"]
+description = "Sullivan (1971) two-coaxial-disc telescope geometric factor from the stack."
+
+[params]
+file = "geometric_factor.py"
+
+[inputs]
+stack = "geometry/stack.yaml"

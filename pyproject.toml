@@ -1,0 +1,44 @@
+[project]
+name = "foundry"
+dynamic = ["version"]
+description = "A hardware-development workbench for Omarchy: requirements, studies, runs and traceability, with pluggable engines."
+requires-python = ">=3.12"
+dependencies = [
+    "textual>=8.0",
+    "pyyaml>=6",
+    "tomli-w>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.6"]
+
+[project.scripts]
+foundry = "foundry.cli:main"
+
+[project.entry-points."foundry.modules"]
+# Third-party modules register here, e.g. `warpx = "foundry_warpx:module"`.
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "foundry.__version__"}
+
+[tool.setuptools.package-data]
+foundry = ["tui/*.tcss", "templates/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

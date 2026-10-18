@@ -1,0 +1,12 @@
+# Blocks with `element:` become subsystems (elements/<name>/).
+blocks:
+  - {id: head, title: Sensor head, kind: mechanical, element: sensor-head,
+     description: "Collimator, D1/D2 silicon, housing"}
+  - {id: fee, title: Front-end electronics, kind: electronics, element: fee,
+     description: "CSA + shaper + discriminators"}
+  - {id: fsw, title: Flight software, kind: software, element: fsw,
+     description: "Coincidence counters, telemetry"}
+interfaces:
+  - {from: head.D1, to: fee.ch1, type: signal, label: charge pulse D1}
+  - {from: head.D2, to: fee.ch2, type: signal, label: charge pulse D2}
+  - {from: fee.hits, to: fsw.gpio, type: data, label: discriminator hits}

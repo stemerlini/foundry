@@ -1,0 +1,9 @@
+blocks:
+  - {id: ppu, title: Power processing unit, kind: electronics, element: ppu}
+  - {id: feed, title: Xenon feed system, kind: mechanical, element: feed}
+  - {id: head, title: Thruster head, kind: mechanical, element: head,
+     description: "Channel, anode, magnetic circuit, cathode"}
+interfaces:
+  - {from: ppu.discharge, to: head.anode, type: power, label: 300 V discharge}
+  - {from: ppu.magnet, to: head.coils, type: power, label: coil current}
+  - {from: feed.out, to: head.gas, type: fluid, label: 1 mg/s Xe}

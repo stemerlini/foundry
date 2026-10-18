@@ -1,0 +1,6 @@
+# Detector stack, front to back. Phase 4 turns this into GDML for Geant4.
+aperture:
+  radius_mm: 5.0
+layers:
+  - {name: D1, material: G4_Si, thickness_um: 300, radius_mm: 5.0}
+  - {name: D2, material: G4_Si, thickness_um: 1500, radius_mm: 10.0, gap_mm: 20.0}

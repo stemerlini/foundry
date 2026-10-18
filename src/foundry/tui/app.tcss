@@ -1,0 +1,188 @@
+Screen {
+    background: $background;
+}
+
+/* -- top bar -------------------------------------------------------------- */
+
+#topbar {
+    height: 4;
+    background: $panel;
+    padding: 0 2;
+}
+#brand-logo {
+    width: 18;
+    padding: 0 2 0 0;
+}
+#brand {
+    width: 28;
+    padding: 1 0 0 0;
+}
+#brand-name {
+    color: $primary;
+}
+#project-line {
+    width: 1fr;
+    padding: 1 0 0 0;
+}
+#activity {
+    width: auto;
+    padding: 1 0 0 0;
+}
+
+/* -- body ----------------------------------------------------------------- */
+
+#body {
+    height: 1fr;
+}
+.pane-title {
+    height: 1;
+    padding: 0 1;
+    color: $primary;
+    text-style: bold;
+    margin: 1 0 1 0;
+}
+#sidebar {
+    width: 40;
+    border-right: solid $primary 20%;
+}
+#elements {
+    height: auto;
+    max-height: 60%;
+    background: $background;
+    padding: 0 1;
+}
+#main {
+    width: 1fr;
+}
+#gate-bar {
+    height: 3;
+    padding: 1 1 0 1;
+}
+#gate-table {
+    height: auto;
+    margin: 1 0;
+}
+#children {
+    padding: 0 1;
+}
+#arch-scroll {
+    height: 1fr;
+    padding: 1 1;
+}
+#arch-diagram {
+    width: auto;
+    color: $primary;
+}
+#block-table {
+    height: 10;
+}
+#output-tree {
+    width: 40;
+    background: $background;
+}
+#run-log {
+    width: 1fr;
+}
+#trace-summary {
+    padding: 0 2;
+}
+
+#tabs {
+    width: 1fr;
+}
+DataTable {
+    height: 1fr;
+    background: $background;
+}
+.detail {
+    height: 12;
+    border-top: solid $primary 20%;
+    padding: 0 1;
+    background: $background;
+}
+#study-detail {
+    height: 14;
+}
+
+/* -- files ---------------------------------------------------------------- */
+
+#file-tree {
+    width: 40;
+    background: $background;
+    border-right: solid $primary 20%;
+}
+#file-scroll {
+    width: 1fr;
+    padding: 0 1;
+}
+
+/* -- dialogs -------------------------------------------------------------- */
+
+ModalScreen {
+    align: center middle;
+    background: $background 60%;
+}
+.dialog {
+    width: 72;
+    height: auto;
+    max-height: 90%;
+    border: round $primary;
+    background: $panel;
+    padding: 1 2;
+}
+.dialog.wide {
+    width: 90;
+}
+.dialog-title {
+    color: $primary;
+    text-style: bold;
+    margin-bottom: 1;
+}
+.dialog Label {
+    margin-top: 1;
+}
+.dialog Button {
+    margin-top: 1;
+}
+#project-list {
+    height: auto;
+    max-height: 24;
+}
+
+/* -- review --------------------------------------------------------------- */
+
+#proposal {
+    height: auto;
+    max-height: 12;
+    padding: 0 1;
+    border-bottom: solid $primary 20%;
+}
+#review-body {
+    height: 1fr;
+}
+#change-table {
+    width: 2fr;
+}
+#diff-scroll {
+    width: 3fr;
+    border-left: solid $primary 20%;
+    padding: 0 1;
+}
+#decision-table {
+    height: 10;
+}
+#decision-context {
+    height: auto;
+    max-height: 16;
+}
+#decision-options {
+    height: auto;
+    max-height: 12;
+    margin: 1 0;
+}
+.buttons {
+    height: auto;
+}
+.buttons Button {
+    margin-right: 2;
+}

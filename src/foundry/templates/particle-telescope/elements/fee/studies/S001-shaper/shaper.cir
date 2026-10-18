@@ -1,0 +1,17 @@
+* Ideal CSA + CR-RC shaper, 1 fC delta-like input (the CSA inverts: measure the minimum)
+Iin 0 in PULSE(0 1u 1n 0.1n 0.1n 0.9n 1)
+Cf in csa 1p
+E1 csa 0 0 in 1e6
+Cd csa x 1n
+Rd x 0 1k
+E2 sh 0 x 0 1
+Ri sh y 1k
+Ci y 0 1n
+.tran 10n 20u
+.meas tran vmin MIN v(y)
+.control
+run
+let gain = -vmin * 1e3
+print gain
+.endc
+.end

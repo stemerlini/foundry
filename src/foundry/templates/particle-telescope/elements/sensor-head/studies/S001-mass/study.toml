@@ -1,0 +1,13 @@
+title = "Mass budget"
+task = "script"
+verifies = ["ME-001"]
+
+[params]
+file = "mass.py"
+housing_wall_mm = 2.0
+housing_od_mm = 40.0
+housing_length_mm = 50.0
+collimator_mass_g = 60.0
+
+[inputs]
+stack = "/geometry/stack.yaml"

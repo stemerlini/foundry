@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Remove what tools/install-omarchy added. Projects, run data and the project folder stay.
+set -euo pipefail
+
+[[ -L $HOME/.local/bin/foundry ]] && rm "$HOME/.local/bin/foundry"
+rm -f "$HOME/.local/share/applications/foundry.desktop"
+rm -f "$HOME"/.local/share/icons/hicolor/{256x256,512x512}/apps/foundry.png \
+      "$HOME/.local/share/icons/hicolor/scalable/apps/foundry.svg"
+[[ -L $HOME/.claude/skills/foundry ]] && rm "$HOME/.claude/skills/foundry"
+echo "Foundry removed from Omarchy."

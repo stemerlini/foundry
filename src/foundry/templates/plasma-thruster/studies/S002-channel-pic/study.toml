@@ -1,0 +1,8 @@
+title = "Discharge channel (PIC)"
+task = "pic.run"
+description = "2-D axial-azimuthal PIC of the channel; Isp from first principles later."
+
+[params]
+code = "warpx"
+input = "inputs_2d"
+ranks = 8

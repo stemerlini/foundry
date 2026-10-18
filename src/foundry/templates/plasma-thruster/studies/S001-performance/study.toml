@@ -1,0 +1,11 @@
+title = "Ideal performance (0-D)"
+task = "script"
+verifies = ["SYS-001", "SYS-002"]
+description = "Exhaust velocity from discharge voltage and utilisation efficiencies."
+
+[params]
+file = "performance.py"
+discharge_voltage = 300.0   # V
+mass_flow = 1.0e-6          # kg/s (1 mg/s Xe)
+voltage_utilisation = 0.9
+mass_utilisation = 0.85

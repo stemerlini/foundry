@@ -1,0 +1,7 @@
+title = "CSA + CR-RC shaper gain"
+task = "ngspice.run"
+verifies = ["EL-001"]
+description = "Ideal CSA (1 pF feedback) and CR-RC shaper (1 us); 1 fC input."
+
+[params]
+deck = "shaper.cir"

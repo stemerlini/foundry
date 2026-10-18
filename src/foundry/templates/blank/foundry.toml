@@ -1,0 +1,6 @@
+[project]
+name = "New project"
+description = "One system element; add subsystems when the architecture is locked."
+
+[modules]
+enabled = ["core", "script", "citadel", "pascaline"]

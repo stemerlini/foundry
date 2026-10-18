@@ -1,0 +1,9 @@
+[project]
+name = "Particle telescope"
+description = "Space radiation sensor: Si / scintillator stack, Geant4 response, bowtie calibration."
+
+[modules]
+enabled = ["core", "script", "citadel", "pascaline", "geant4", "ngspice", "kicad", "freecad", "software"]
+
+[toolchains]
+geant4 = "11.4.3"

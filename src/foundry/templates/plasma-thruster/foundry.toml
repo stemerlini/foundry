@@ -1,0 +1,6 @@
+[project]
+name = "Plasma thruster"
+description = "Electric propulsion: discharge physics (PIC / MHD), performance, PPU, feed system."
+
+[modules]
+enabled = ["core", "script", "citadel", "pascaline", "pic", "ngspice", "kicad", "freecad"]

@@ -1,0 +1,11 @@
+title = "Proton response matrix (Geant4)"
+task = "geant4.run"
+verifies = ["SYS-003"]
+description = "Isotropic protons 1-200 MeV on the stack; per-layer deposits."
+
+[params]
+macro = "response.mac"
+threads = 8
+
+[inputs]
+stack = "geometry/stack.yaml"

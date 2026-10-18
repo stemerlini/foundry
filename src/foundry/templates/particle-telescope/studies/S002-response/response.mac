@@ -1,0 +1,8 @@
+# Filled in Phase 4 (foundry-g4).
+/run/initialize
+/gps/particle proton
+/gps/ene/type Pow
+/gps/ene/min 1 MeV
+/gps/ene/max 200 MeV
+/gps/ene/alpha -1
+/run/beamOn 1000000
