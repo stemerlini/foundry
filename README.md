@@ -14,12 +14,25 @@ See [PLAN.md](PLAN.md) for the vision, the model and the phases.
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
 .venv/bin/foundry templates
-.venv/bin/foundry new ptel -t particle-telescope   # created under ~/Hardware
+.venv/bin/foundry new ptel -t hardware   # or software, publication; under ~/Hardware
 .venv/bin/foundry status -C ~/Hardware/ptel
-.venv/bin/foundry run sensor-head/S001 --wait -C ~/Hardware/ptel
+.venv/bin/foundry run S001 --wait -C ~/Hardware/ptel
 .venv/bin/foundry arch -C ~/Hardware/ptel
 .venv/bin/foundry -C ~/Hardware/ptel               # TUI
 .venv/bin/pytest
+```
+
+## Working with an agent
+
+Press `a` in the TUI: start a Claude Code session on the selected element, go to the one
+already running (the top bar shows `◆ agent working`), or continue the last one after a
+usage limit resets. The agent never commits: its changes wait in the Review tab (`8`) with
+`.foundry/proposal.md`, which is also its handover to the next session.
+
+```bash
+foundry agent fee -t "size the ADC"   # new session (-w: own window)
+foundry agent --continue              # resume the last session; --fork resumes a copy
+foundry agent --sessions              # saved and running sessions
 ```
 
 ## Writing a module

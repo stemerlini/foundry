@@ -237,6 +237,15 @@ Foundry is agent-first, and the human stays the engineer of record.
   recommendation (`foundry ask`); accepted or rejected only by the human (`foundry decide`
   or the Review tab), with a note kept in the record. Accepted decisions bind the agent.
 - The TUI refreshes by itself when files change, so it follows the agent live.
+- **The agent belongs to the project** (2026-10-19). The top bar shows `◆ agent working`
+  while a Claude Code session runs in the project folder. `a` opens one dialog: go to the
+  running session (focuses its window), continue the last saved session (after a usage
+  limit resets), continue a copy, or start a new one on the selected element with a task.
+  CLI: `foundry agent --sessions | --continue | --fork`. Sessions are Claude Code's own
+  transcripts (`~/.claude/projects/<folder>`); Foundry only finds them.
+- **Handover:** a session can stop at any moment, so the proposal doubles as the handover:
+  written at the first change, with a `## Where I stopped` section kept current. A new
+  session's brief tells it to read the proposal first.
 
 ## What changes in the scaffold (Phase 0b)
 
@@ -252,6 +261,13 @@ Changes:
 5. Requirement flow-down (`parent`, `allocated`) in the trace.
 6. Templates become element trees (telescope: system + fee + sensor-head + fsw; thruster:
    system + PPU + thruster head + feed system; software: system + services).
+
+## Templates (decided 2026-10-18)
+
+Three, no more for now: **hardware** (system budgets, electronics, mechanics, firmware),
+**software** (components, code verified by tests) and **publication** (claims, outline as
+the architecture, analyses behind every number, PDF build with page and word metrics).
+The particle-telescope and plasma-thruster trees live on as test fixtures.
 
 ## Phases
 

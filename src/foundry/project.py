@@ -32,7 +32,7 @@ class Project:
     root: Path
     id: str
     name: str
-    template: str = "blank"
+    template: str = "hardware"
     description: str = ""
     modules: list[str] = field(default_factory=list)
     toolchains: dict[str, str] = field(default_factory=dict)
@@ -54,7 +54,7 @@ class Project:
             root=root,
             id=p.get("id") or root.name,
             name=p.get("name") or root.name,
-            template=p.get("template", "blank"),
+            template=p.get("template", "hardware"),
             description=p.get("description", ""),
             modules=list(data.get("modules", {}).get("enabled", [])),
             toolchains=dict(data.get("toolchains", {})),
@@ -266,13 +266,15 @@ def templates() -> dict[str, str]:
     return dict(sorted(found.items()))
 
 
-def create(target: Path, template: str = "blank", name: str | None = None,
+def create(target: Path, template: str = "hardware", name: str | None = None,
            project_id: str | None = None, git: bool = True) -> Project:
-    """Make a new project from a template (a folder under ``foundry/templates``)."""
+    """Make a new project from a template: a name under ``foundry/templates``, or the path
+    of any folder laid out like one."""
     target = target.expanduser().resolve()
     if target.exists() and any(target.iterdir()):
         raise ProjectError(f"{target} exists and is not empty")
-    source = files("foundry.templates") / template
+    path = Path(template).expanduser()
+    source = path if (path / MANIFEST).is_file() else files("foundry.templates") / template
     if not (source / MANIFEST).is_file():
         raise ProjectError(f"unknown template {template!r} (have: {', '.join(templates())})")
     shutil.copytree(str(source), target, dirs_exist_ok=True)
@@ -281,7 +283,7 @@ def create(target: Path, template: str = "blank", name: str | None = None,
     data = tomllib.loads(manifest.read_text())
     data["project"]["id"] = project_id or slug(target.name)
     data["project"]["name"] = name or data["project"].get("name") or target.name
-    data["project"]["template"] = template
+    data["project"]["template"] = Path(template).name
     manifest.write_text(tomli_w.dumps(data))
     (target / ".gitignore").write_text(".foundry/\n__pycache__/\n")
     from . import agent

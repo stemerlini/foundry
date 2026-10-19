@@ -1,0 +1,6 @@
+[project]
+name = "Publication"
+description = "A paper or report: claims, outline, the analyses behind every number, the PDF."
+
+[modules]
+enabled = ["core", "script", "citadel", "pascaline", "publication"]

@@ -1,0 +1,6 @@
+[project]
+name = "Hardware project"
+description = "A physical product: system budgets and architecture, then electronics, mechanics and firmware."
+
+[modules]
+enabled = ["core", "script", "citadel", "pascaline", "ngspice", "kicad", "freecad", "software"]

@@ -1,0 +1,8 @@
+# Components of the program. Give a block `element:` when it grows into its own element.
+blocks:
+  - {id: interface, title: Interface, kind: software, description: "CLI / TUI / API"}
+  - {id: core, title: Core logic, kind: software}
+  - {id: storage, title: Storage, kind: software, description: "files, database"}
+interfaces:
+  - {from: interface.calls, to: core.api, type: call, label: commands}
+  - {from: core.data, to: storage.io, type: data, label: records}

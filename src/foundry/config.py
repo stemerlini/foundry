@@ -8,20 +8,25 @@ from pathlib import Path
 
 import tomli_w
 
-CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "foundry/config.toml"
+
+def config_path() -> Path:
+    """Looked up on every call, so XDG_CONFIG_HOME set later (tests) is honoured."""
+    base = os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config"
+    return Path(base) / "foundry/config.toml"
 DEFAULT_PROJECTS_ROOT = Path.home() / "Hardware"
 
 
 def load() -> dict:
     try:
-        return tomllib.loads(CONFIG.read_text())
+        return tomllib.loads(config_path().read_text())
     except (OSError, tomllib.TOMLDecodeError):
         return {}
 
 
 def save(data: dict) -> None:
-    CONFIG.parent.mkdir(parents=True, exist_ok=True)
-    CONFIG.write_text(tomli_w.dumps(data))
+    path = config_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(tomli_w.dumps(data))
 
 
 def projects_root() -> Path:

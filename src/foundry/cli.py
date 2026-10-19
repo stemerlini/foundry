@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
 import subprocess
@@ -372,7 +373,25 @@ def cmd_agent(args):
     if args.print:
         out(args, {"brief": agent.brief(p, e, task)}, agent.brief(p, e, task))
         return
-    argv = agent.window_command(p, e, task) if args.window else agent.command(p, e, task)
+    if args.sessions:
+        found, live = agent.sessions(p), agent.running(p)
+        out(args, {"running": live, "sessions": [
+            {"id": s.id, "modified": dt.datetime.fromtimestamp(s.modified).isoformat(
+                timespec="seconds"), "prompt": s.prompt} for s in found]},
+            "\n".join([f"running: pid {', '.join(map(str, live))}"] if live else [])
+            + "".join(f"\n{s.id[:8]}  {dt.datetime.fromtimestamp(s.modified):%Y-%m-%d %H:%M}  "
+                      f"{s.prompt[:70]}" for s in found).lstrip("\n")
+            or "No agent sessions yet")
+        return
+    if args.resume or args.fork:
+        found = agent.sessions(p)
+        if not found:
+            raise ProjectError("no saved agent session in this project; start one with "
+                               "`foundry agent`")
+        argv = agent.resume_command(found[0], fork=args.fork)
+        argv = agent.window(p, argv) if args.window else argv
+    else:
+        argv = agent.window_command(p, e, task) if args.window else agent.command(p, e, task)
     for rel in agent.ensure_files(p):
         print(f"Added {rel} (agent guardrails; approve it in the Review tab)", file=sys.stderr)
     if args.window:
@@ -416,7 +435,8 @@ def parser() -> argparse.ArgumentParser:
 
     p = add("new", cmd_new, "create a project from a template")
     p.add_argument("path", help="folder, or a name created under the projects root")
-    p.add_argument("-t", "--template", default="blank")
+    p.add_argument("-t", "--template", default="hardware",
+                   help="hardware | software | publication (or a template folder)")
     p.add_argument("--name")
     p.add_argument("--id")
     p.add_argument("--no-git", action="store_true")
@@ -482,6 +502,11 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("-t", "--task", help="what to work on (default: summarise and propose)")
     p.add_argument("-w", "--window", action="store_true", help="open in a new window")
     p.add_argument("--print", action="store_true", help="only print the brief")
+    p.add_argument("-c", "--continue", dest="resume", action="store_true",
+                   help="continue the last session (e.g. after a usage limit reset)")
+    p.add_argument("--fork", action="store_true",
+                   help="continue a copy of the last session, keeping the original")
+    p.add_argument("--sessions", action="store_true", help="list saved and running sessions")
     add("tasks", cmd_tasks, "tasks studies can use, with their parameters; element kinds")
     add("tui", cmd_tui, "open the TUI (default)")
     return ap

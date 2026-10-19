@@ -1,0 +1,7 @@
+title = "Key result"
+task = "script"
+verifies = ["PUB-001"]
+description = "The analysis behind the main claim; write its number(s) with metrics.write."
+
+[params]
+file = "analysis.py"

@@ -1,0 +1,6 @@
+[project]
+name = "Software project"
+description = "A program or library: requirements and architecture, then code verified by its tests."
+
+[modules]
+enabled = ["core", "script", "citadel", "pascaline", "software"]

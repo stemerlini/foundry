@@ -46,6 +46,7 @@ from ..modules import registry
 from ..project import Project, ProjectError
 from . import logo
 from .screens import (
+    AgentScreen,
     ApproveScreen,
     ConfirmScreen,
     DecideScreen,
@@ -129,6 +130,7 @@ class FoundryApp(App):
         self.selected_run: str | None = None
         self._log_pos = 0
         self._git_seen: tuple = ()
+        self._agent_live = False
         self.pending: list[review.Change] = []
 
     # --- layout ----------------------------------------------------------------------------
@@ -294,6 +296,10 @@ class FoundryApp(App):
         except OSError:
             mtimes = ()
         changed = (seen, mtimes) != self._git_seen
+        live = bool(agent.running(self.project))
+        if live != self._agent_live:
+            self._agent_live = live
+            self.refresh_topbar()
         self._git_seen = (seen, mtimes)
         if changed or any(s.status == pipeline.RUNNING for s in self.states.values()):
             if changed and {p for p in self.elements} != {e.path for e in
@@ -312,9 +318,11 @@ class FoundryApp(App):
             (p.branch() or "no branch", "magenta"), " @ ", (commit or "no commits", "dim"),
             ("  ·  uncommitted changes", "yellow") if dirty else ""))
         active = [s for s in self.states.values() if s.status == pipeline.RUNNING]
-        self.query_one("#activity", Static).update(
-            Text(f"⟳ {len(active)} running: " + ", ".join(s.study.key for s in active), "cyan")
-            if active else Text(f"v{__version__}", "dim"))
+        text = (Text(f"⟳ {len(active)} running: " + ", ".join(s.study.key for s in active), "cyan")
+                if active else Text(f"v{__version__}", "dim"))
+        if self._agent_live:
+            text = Text.assemble(("◆ agent working", "bold magenta"), "  ", text)
+        self.query_one("#activity", Static).update(text)
 
     def refresh_tree_labels(self) -> None:
         for path, node in self.nodes.items():
@@ -876,12 +884,30 @@ class FoundryApp(App):
         if not shutil.which("claude"):
             self.notify("Claude Code (claude) is not on PATH", severity="error")
             return
-        argv = agent.window_command(self.project, self.element)
-        written = agent.ensure_files(self.project)
-        if written:
-            self.notify(f"Added agent guardrails: {', '.join(written)} (review them)")
-        self.launch(argv)
-        self.notify(f"Agent session opening for {self.element.title}")
+        p, e = self.project, self.element
+        live = agent.running(p)
+        found = agent.sessions(p)
+
+        def go(choice: tuple[str, str] | None) -> None:
+            if not choice:
+                return
+            action, task = choice
+            if action == "focus":
+                if not any(agent.focus(pid) for pid in live):
+                    self.notify("The session runs in a terminal Foundry cannot find; "
+                                "switch to it yourself", severity="warning")
+                return
+            written = agent.ensure_files(p)
+            if written:
+                self.notify(f"Added agent guardrails: {', '.join(written)} (review them)")
+            if action in ("continue", "fork"):
+                self.launch(agent.window(p, agent.resume_command(found[0], action == "fork")))
+                self.notify("Continuing the last agent session")
+            else:
+                self.launch(agent.window_command(p, e, task))
+                self.notify(f"Agent session opening for {e.title}")
+
+        self.push_screen(AgentScreen(e.title, bool(live), found[0] if found else None), go)
 
     def action_help(self) -> None:
         self.push_screen(HelpScreen())

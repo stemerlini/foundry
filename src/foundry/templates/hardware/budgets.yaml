@@ -1,0 +1,6 @@
+# Mass and power estimates per block; the budget study adds margin and totals them.
+margin: 0.20          # 20 % system margin on top of the estimates
+blocks:
+  electronics: {mass_g: 150, power_w: 2.5}
+  mechanics:   {mass_g: 400, power_w: 0.0}
+  firmware:    {mass_g: 0,   power_w: 0.0}

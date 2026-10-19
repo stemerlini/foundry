@@ -3,8 +3,8 @@ import pytest
 from foundry.project import Project, ProjectError, create, templates
 
 
-def test_templates_are_listed():
-    assert {"blank", "particle-telescope", "plasma-thruster"} <= set(templates())
+def test_three_templates():
+    assert set(templates()) == {"hardware", "software", "publication"}
 
 
 def test_create_and_load_tree(make):

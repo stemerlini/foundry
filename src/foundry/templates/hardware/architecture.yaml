@@ -1,0 +1,11 @@
+# Blocks with `element:` are subsystems (elements/<name>/). Edit to match the product.
+blocks:
+  - {id: electronics, title: Electronics, kind: electronics, element: electronics}
+  - {id: mechanics, title: Mechanics, kind: mechanical, element: mechanics}
+  - {id: firmware, title: Firmware, kind: software, element: firmware}
+interfaces:
+  - {from: mechanics.mounts, to: electronics.board, type: mechanical, label: board mounts}
+  - {from: electronics.mcu, to: firmware.hal, type: data, label: registers}
+allocate:
+  SYS-002: [electronics, mechanics]
+  SYS-003: [electronics]

@@ -1,0 +1,8 @@
+title = "Build the PDF"
+task = "publication.build"
+gate = "deliver"
+verifies = ["PUB-002"]
+
+[params]
+source = "design/main.tex"
+engine = "latexmk"

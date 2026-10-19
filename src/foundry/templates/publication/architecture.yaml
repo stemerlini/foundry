@@ -1,0 +1,10 @@
+# The outline: sections are blocks, interfaces carry the argument from one to the next.
+blocks:
+  - {id: intro, title: Introduction, kind: manuscript, description: "the gap, the question"}
+  - {id: methods, title: Methods, kind: manuscript}
+  - {id: results, title: Results, kind: manuscript}
+  - {id: discussion, title: Discussion, kind: manuscript, description: "meaning, limits"}
+interfaces:
+  - {from: intro.question, to: methods.approach, type: argument, label: what we test}
+  - {from: methods.data, to: results.findings, type: argument, label: how we measured}
+  - {from: results.findings, to: discussion.meaning, type: argument, label: what it shows}

@@ -107,6 +107,12 @@ Sensor-head mass budget and collimator trade
 - Assumed Al 6061 housing, 2 mm walls.
 - Check: the tungsten density in mass.py (19.3 g/cm³).
 - Asked D002: tungsten vs brass collimator.
+
+## Where I stopped
+
+- Done: ME-002, study S002 and its run.
+- Half-done: sensor-head/architecture.yaml has the collimator block but no interface yet.
+- Next: add the collimator–housing interface, then rerun `foundry check`.
 ```
 
 ## A script study

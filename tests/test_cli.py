@@ -1,11 +1,13 @@
 import json
+from pathlib import Path
 
 from foundry.cli import main
 
 
 def test_new_status_run_req(tmp_path, capsys):
     root = tmp_path / "thr"
-    assert main(["new", str(root), "-t", "plasma-thruster"]) == 0
+    fixture = Path(__file__).parent / "fixtures/plasma-thruster"
+    assert main(["new", str(root), "-t", str(fixture)]) == 0
     manifest = root / "foundry.toml"
     manifest.write_text(manifest.read_text() + f'\n[store]\nroot = "{tmp_path / "store"}"\n')
     capsys.readouterr()

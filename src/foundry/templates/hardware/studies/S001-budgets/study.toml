@@ -1,0 +1,10 @@
+title = "Mass and power budgets"
+task = "script"
+verifies = ["SYS-002", "SYS-003"]
+description = "Sums the per-block estimates in budgets.yaml and adds the system margin."
+
+[params]
+file = "budgets.py"
+
+[inputs]
+budgets = "budgets.yaml"

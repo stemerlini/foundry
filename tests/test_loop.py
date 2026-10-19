@@ -1,6 +1,7 @@
 """The human in the loop: decisions, review (approve / reject) and the agent brief."""
 
 import json
+import os
 import subprocess
 
 import pytest
@@ -100,3 +101,34 @@ def test_agent_brief_and_window(make):
     assert argv[0] in ("omarchy-launch-tui", "xdg-terminal-exec")
     assert "claude" in argv and argv[-1].endswith("Size the CSA")
     assert str(p.root) in argv
+
+
+def fake_session(p, sid, prompt, mtime):
+    """A Claude Code transcript as it lands in ~/.claude/projects/<folder>."""
+    folder = agent.session_dir(p)
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"{sid}.jsonl"
+    path.write_text(json.dumps({"type": "user", "message": "hi"}) + "\n"
+                    + json.dumps({"type": "last-prompt", "lastPrompt": prompt}) + "\n")
+    os.utime(path, (mtime, mtime))
+    return path
+
+
+def test_agent_sessions_continue_and_handover(make, capsys):
+    p = make()
+    assert agent.sessions(p) == [] and agent.running(p) == []
+    assert main(["agent", "--continue", "-C", str(p.root)]) != 0
+    fake_session(p, "old", "first", 1_000)
+    fake_session(p, "new", "size the\nADC", 2_000)
+    found = agent.sessions(p)
+    assert [s.id for s in found] == ["new", "old"] and found[0].prompt == "size the ADC"
+    assert agent.resume_command(found[0]) == ["claude", "--resume", "new"]
+    assert agent.resume_command(found[0], fork=True)[-1] == "--fork-session"
+    capsys.readouterr()
+    main(["agent", "--sessions", "--json", "-C", str(p.root)])
+    data = json.loads(capsys.readouterr().out)
+    assert data["running"] == [] and data["sessions"][0]["prompt"] == "size the ADC"
+    assert "handover" not in agent.brief(p, p.tree())
+    (p.root / review.PROPOSAL).parent.mkdir(exist_ok=True)
+    (p.root / review.PROPOSAL).write_text("Mass budget\n\n## Where I stopped\n")
+    assert ".foundry/proposal.md: read it first" in agent.brief(p, p.tree())

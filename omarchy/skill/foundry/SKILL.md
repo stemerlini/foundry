@@ -33,8 +33,13 @@ The user is the engineer of record; you work to their review. Every session:
    and say so when it does.
 4. **Leave a proposal.** Your changes stay uncommitted. Write `.foundry/proposal.md`: line
    one is the commit title; then what changed and why, the assumptions you made, the
-   numbers to check, and open questions. Update it as the work grows. Done when the
-   proposal accounts for every file `foundry review` lists.
+   numbers to check, and open questions. Done when the proposal accounts for every file
+   `foundry review` lists.
+   It is also the handover: a session can stop at any moment (a usage or context limit),
+   and the next one starts by reading it. So write it as soon as you change the first file,
+   and after every step that matters update its `## Where I stopped` section: what is done,
+   what is half-done (which file, what remains), and the next step. Never leave a result
+   only in the chat.
 5. **Hand over.** End with: what to review (Review tab, key `8`), decisions waiting, and
    what you would do next.
 
@@ -47,9 +52,9 @@ Committing, tagging, locking, approving and deciding belong to the user (the pro
    environment, and the few numbers that define success. Ask the user only for what you
    cannot sensibly assume (the mission, a hard limit); everything else becomes an
    assumption you list at the end. Done when you can name the system's top 3–8 needs.
-2. **Create.** `foundry templates`, then `foundry new <name> -t <template>` (closest
-   template, or `blank`), which creates `~/Hardware/<name>`. Replace the template's
-   example content with this product's; delete example studies that do not apply.
+2. **Create.** `foundry new <name> -t hardware|software|publication`, which creates
+   `~/Hardware/<name>`. Replace the template's placeholder content with this product's;
+   delete placeholder studies that do not apply.
 3. **Describe.** Write the system `element.md` and its requirements `req/SYS-*.md`.
    Give a requirement a `criterion` whenever its need has a number; each one is one
    verifiable statement. Done when every need from step 1 is a requirement.

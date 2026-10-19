@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 import tomllib
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label, Markdown, OptionList, Select
 from textual.widgets.option_list import Option
 
-from .. import config
+from .. import agent, config
 from ..model import STUDY_GATES, Element
 from ..modules import registry
 from ..project import MANIFEST, Project, ProjectError, create, slug, templates, write_study
@@ -56,7 +57,7 @@ class NewProjectScreen(ModalScreen[Path | None]):
             yield Label("New project", classes="dialog-title")
             yield Label("Template")
             yield Select([(f"{k} — {v}", k) for k, v in templates().items()],
-                         value="blank", allow_blank=False, id="template")
+                         value="hardware", allow_blank=False, id="template")
             yield Label("Name")
             yield Input(placeholder="Particle telescope", id="name")
             yield Label(f"Folder (under {config.projects_root()} unless absolute)")
@@ -237,6 +238,48 @@ class DecideScreen(ModalScreen[tuple[str, str | None, str] | None]):
         self.dismiss(("accept", option, note))
 
 
+class AgentScreen(ModalScreen[tuple[str, str] | None]):
+    """Start, continue or return to the project's agent session. Returns (action, task)."""
+
+    BINDINGS = [Binding("escape", "dismiss(None)", "Close")]
+
+    def __init__(self, element: str, live: bool, last: agent.Session | None) -> None:
+        super().__init__()
+        self.element, self.live, self.last = element, live, last
+
+    def compose(self) -> ComposeResult:
+        with Vertical(classes="dialog wide"):
+            yield Label("Agent", classes="dialog-title")
+            if self.live:
+                yield Label("An agent session is working in this project.")
+                yield Button("Go to it", variant="primary", id="focus")
+            elif self.last:
+                ago = humanize(time.time() - self.last.modified)
+                yield Label(Text.assemble(("Last session ", "dim"), ago, ("  ·  ", "dim"),
+                                          self.last.prompt[:110] or "(no prompt)"))
+                yield Button("Continue it", variant="primary", id="continue")
+                yield Button("Continue a copy (keeps the original)", id="fork")
+            yield Label(f"New session on {self.element}")
+            yield Input(placeholder="What to work on (empty: summarise and propose)", id="task")
+            yield Button("Start new session", id="new",
+                         variant="default" if self.live or self.last else "primary")
+
+    @on(Button.Pressed)
+    def pressed(self, event: Button.Pressed) -> None:
+        self.dismiss((event.button.id, self.query_one("#task", Input).value))
+
+    @on(Input.Submitted)
+    def submitted(self) -> None:
+        self.dismiss(("new", self.query_one("#task", Input).value))
+
+
+def humanize(seconds: float) -> str:
+    for size, unit in ((86400, "d"), (3600, "h"), (60, "min")):
+        if seconds >= size:
+            return f"{int(seconds // size)} {unit} ago"
+    return "just now"
+
+
 HELP = """\
 ## Foundry
 
@@ -259,7 +302,7 @@ change marks studies, and what they verify, **stale**. Lock baselines an element
 | `d` | decompose the selected block into a subsystem (Architecture tab) |
 | `L` | lock the element (needs a commit and proven analysis) |
 | `c` | cancel the selected run |
-| `a` | start an agent session (Claude Code, new window) on this element |
+| `a` | agent: go to the running session, continue the last one, or start one here |
 | `8` | Review: the agent's proposal, its changes (diff) and open decisions |
 | `y` / `x` | approve (commit) / discard pending changes (Review tab) |
 | `enter` | answer the selected decision (Review tab) |

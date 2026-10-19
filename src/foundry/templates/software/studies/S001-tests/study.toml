@@ -1,0 +1,7 @@
+title = "Test suite"
+task = "software.pytest"
+gate = "design"
+verifies = ["SW-001"]
+
+[params]
+path = "design/tests"

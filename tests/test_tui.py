@@ -79,3 +79,26 @@ async def test_review_tab_decide_approve_reject(make):
         await pilot.pause()
         assert review.changes(p) == []
         assert p.git("log", "-1", "--format=%s") == "Orbit decided, first sketch"
+
+
+async def test_agent_dialog_continues_last_session(make, monkeypatch):
+    from foundry import agent
+    from foundry.tui.screens import AgentScreen
+
+    p = make()
+    folder = agent.session_dir(p)
+    folder.mkdir(parents=True)
+    (folder / "abc.jsonl").write_text('{"type": "last-prompt", "lastPrompt": "size the ADC"}\n')
+    monkeypatch.setattr("shutil.which", lambda name: f"/usr/bin/{name}")
+    app = FoundryApp(p.root)
+    launched = []
+    monkeypatch.setattr(app, "launch", launched.append)
+    async with app.run_test(size=(150, 44)) as pilot:
+        await pilot.pause()
+        await pilot.press("a")
+        await pilot.pause()
+        assert isinstance(app.screen, AgentScreen)
+        await pilot.click("#continue")
+        await pilot.pause()
+    assert launched and launched[0][-3:] == ["claude", "--resume", "abc"]
+    assert str(p.root) in launched[0]
