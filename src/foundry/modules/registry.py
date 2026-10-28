@@ -9,7 +9,8 @@ from importlib.metadata import entry_points
 from .api import ElementKind, Module, Task, Viewer
 
 BUILTIN = (
-    "core", "script", "geant4", "pic", "ngspice", "kicad", "freecad", "software", "publication",
+    "core", "script", "geant4", "irene", "pic", "ngspice", "kicad", "freecad", "software",
+    "publication",
     "pascaline",
     "citadel",
 )

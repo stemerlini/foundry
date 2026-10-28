@@ -5,9 +5,10 @@
 > describe, research, architect, conceive, analyse until proven, lock, then break the
 > product into subsystems and run the same loop on each, down to a design, a report and a BOM.
 
-Status: Phase 0b done (2026-10-12) plus the human-in-the-loop agent workflow (2026-10-18):
-decisions, Review tab, `foundry agent`, enforced guardrails; installed in Omarchy; 41 tests.
-Staged in git, not committed. Geant4 not built yet (needs `xerces-c`).
+Status: Phase 0b done (2026-10-12) plus the human-in-the-loop agent workflow (2026-10-18),
+integrated agent sessions (2026-10-19) and the IRENE environment module (2026-10-28, built
+from AFRL source, verified against AFRL's expected output); 56 tests; on GitHub. Geant4
+not built yet (`xerces-c` is now installed).
 
 ## Vision
 
@@ -275,6 +276,8 @@ The particle-telescope and plasma-thruster trees live on as test fixtures.
 1. **Architecture view** — TUI block diagram, SVG/Canvas export, `decompose`.
 2. **Reports & Obsidian** — report templates, data blocks, Citadel citations, vault link, Bases.
 3. **Viewers** — inline plots, f3d, ParaView launcher with per-study state, Hyprland rules.
+3b. ✓ **Environment** — IRENE (AE9/AP9) `irene.environment`: orbit → spectra (CSV), Geant4
+   GPS sources, TID vs Al depth; `irene.run` for any hand-written input; `tools/build-irene`.
 4. **Geant4** — build toolchain; `foundry-g4` generic app; stack → GDML; response; bowtie.
 5. **Baselines** — lock/unlock, tags, frozen reports, change impact on children.
 6. **Electronics** — ngspice studies (metrics from `.meas`), KiCad ERC/DRC, BOM + Gerbers.

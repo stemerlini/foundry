@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import re
 import shutil
+import subprocess
 
 from ..model import Metric
 from .api import Check, Command, ElementKind, FileKind, Module, Param, RunContext, Task, Tool
@@ -27,12 +28,21 @@ def build_command(ctx: RunContext) -> Command:
     return Command(ENGINES[engine](src, ctx.outputs_dir), cwd=src.parent)
 
 
+def page_count(pdf) -> int:
+    """pdfinfo when present; else count page objects (misses compressed object streams)."""
+    try:
+        out = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
+        return int(re.search(r"(?m)^Pages:\s+(\d+)", out).group(1))
+    except (OSError, AttributeError):
+        return len(re.findall(rb"/Type\s*/Page[^s]", pdf.read_bytes()))
+
+
 def build_collect(ctx: RunContext) -> dict[str, Metric]:
     src = ctx.element_dir / ctx.params["source"]
     pdf = ctx.outputs_dir / (src.stem + ".pdf")
     found = {}
     if pdf.is_file():
-        found["pages"] = Metric(len(re.findall(rb"/Type\s*/Page[^s]", pdf.read_bytes())))
+        found["pages"] = Metric(page_count(pdf))
         out = ctx.element_dir / "out"
         out.mkdir(exist_ok=True)
         shutil.copy2(pdf, out / pdf.name)  # the deliverable, for the Deliver gate

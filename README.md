@@ -4,7 +4,7 @@ A universal development workbench for Omarchy. A product is a tree of **elements
 (system → subsystems → components); every element goes through the same loop —
 Describe · Research · Architect · Concept · Analyse · Lock · Design · Deliver — with each
 gate's status computed from what exists. Requirements carry criteria on metrics; studies
-run module tasks (Geant4, PIC, ngspice, KiCad, pytest, scripts…) and record runs whose
+run module tasks (Geant4, IRENE AE9/AP9, PIC, ngspice, KiCad, pytest, scripts…) and record runs whose
 metrics pass or fail them; derived requirements roll up to their parents; any change marks
 what depends on it stale. Notes and reports live in the Obsidian vault, papers in Citadel,
 design data in the project's git repo.
@@ -34,6 +34,14 @@ foundry agent fee -t "size the ADC"   # new session (-w: own window)
 foundry agent --continue              # resume the last session; --fork resumes a copy
 foundry agent --sessions              # saved and running sessions
 ```
+
+## Radiation environment (IRENE)
+
+`tools/build-irene` builds AFRL's IRENE (AE9/AP9/SPM) from its source distribution into
+`~/.local/opt/irene/<version>` and adds an `irene` command. A study with
+`task = "irene.environment"` takes orbit elements, models (AE9, AP9, AE8, AP8) and a statistic
+(mean, a percentile, or a Monte Carlo confidence level) and writes orbit-average/peak spectra,
+Geant4 GPS source macros and total dose behind aluminium (`tid_<d>mm` metrics).
 
 ## Writing a module
 

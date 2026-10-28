@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# Build IRENE (AE9/AP9/SPM, AFRL) from its source distribution into
+# ~/.local/opt/irene/<version>, the toolchain layout Foundry's `irene` module expects:
+#   bin/CmdLineIrene, lib/, modelData/, kernelXml/, irene.sh
+#
+# Single-threaded, no GUI (Foundry is the front end). Needs: cmake gcc boost hdf5 xerces-c gtest.
+#   tools/build-irene [path/to/Irene]      (default: ~/.local/src/irene-*/Irene, newest)
+set -euo pipefail
+
+src="${1:-$(ls -d "$HOME"/.local/src/irene-*/Irene 2>/dev/null | sort -V | tail -1)}"
+[[ -d "$src/source/irene_cpp" ]] || { echo "No IRENE source at '$src'" >&2; exit 1; }
+version=$(basename "$(ls "$src"/version_*.txt)" .txt); version=${version#version_}
+prefix="$HOME/.local/opt/irene/$version"
+build="$src/source/build_linux"
+jobs=$(nproc)
+
+# Boost headers: the system package, or headers unpacked into $build/boost-headers/boost
+# (matching the installed boost-libs version) when the package can't be installed.
+boost_args=()
+if [[ -d "$build/boost-headers/boost" ]]; then
+  boost_args=(-DBoost_INCLUDE_DIR="$build/boost-headers")
+  need=(boost-libs hdf5 xerces-c gtest cmake)
+else
+  need=(boost hdf5 xerces-c gtest cmake)
+fi
+for pkg in "${need[@]}"; do
+  pacman -Q "$pkg" >/dev/null 2>&1 || { echo "Missing: sudo pacman -S --needed $pkg" >&2; exit 1; }
+done
+
+echo "IRENE $version: $src -> $prefix"
+cmake -S "$src/source/SpWx_Irene" -B "$build/Irene_SpWx" -DBUILD_IRENE_SPWX=ON \
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$prefix" "${boost_args[@]}"
+cmake --build "$build/Irene_SpWx" -j "$jobs"
+cmake --install "$build/Irene_SpWx"
+
+cmake -S "$src/source/irene_cpp" -B "$build/irene_cpp" -DUSE_MPI=OFF \
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$prefix" "${boost_args[@]}"
+cmake --build "$build/irene_cpp" -j "$jobs"
+cmake --install "$build/irene_cpp"
+
+# Model databases and dose kernels next to the binaries; the docs stay in the source tree.
+cp -r "$src/modelData" "$src/kernelXml" "$prefix/"
+cp "$src/irene_defs.py" "$prefix/"
+rm -f "$prefix/../irene_defs.py"  # irene_cpp's install drops a copy one level up
+cat > "$prefix/irene.sh" <<EOF
+# IRENE $version environment (sourced by Foundry's toolchain loader)
+export IRENE_HOME="$prefix"
+export IRENE_DATA="$prefix/modelData"
+export IRENE_KERNELS="$prefix/kernelXml"
+export PATH="$prefix/bin:\$PATH"
+export PYTHONPATH="$prefix\${PYTHONPATH:+:\$PYTHONPATH}"
+EOF
+
+# `irene -i input.txt` from any terminal: CmdLineIrene with its environment (input files can
+# use $IRENE_DATA for the model databases).
+mkdir -p "$HOME/.local/bin"
+cat > "$HOME/.local/bin/irene" <<EOF
+#!/usr/bin/env bash
+# IRENE $version (AE9/AP9/SPM) command line; installed by Foundry's tools/build-irene
+source "$prefix/irene.sh"
+# by absolute path: CmdLineIrene finds its helper programs (FluxTask...) next to itself
+exec "$prefix/bin/CmdLineIrene" "\$@"
+EOF
+chmod +x "$HOME/.local/bin/irene"
+
+# The AFRL sample, checked against its expected output.
+test_dir=$(mktemp -d)
+sed -e "s|\.\./\.\./modelData|$prefix/modelData|g" -e "s|\.\./\.\./samples/|$test_dir/|g" \
+  "$src/samples/Ap9ShortInput.txt" > "$test_dir/input.txt"
+(cd "$test_dir" && "$HOME/.local/bin/irene" -i input.txt >/dev/null)
+if python3 - "$test_dir/Ap9ShortOutput_mean_flux.txt" \
+    "$src/samples/expectedOutput/Ap9ShortOutput_mean_flux.txt" <<'PY'
+import math, sys
+rows = [[[float(x) for x in l.split(",")] for l in open(f) if l.strip() and l[0] != "#"]
+        for f in sys.argv[1:]]
+ok = len(rows[0]) == len(rows[1]) > 0 and all(
+    math.isclose(a, b, rel_tol=1e-4, abs_tol=1e-30)
+    for r, s in zip(*rows) for a, b in zip(r, s, strict=True))
+sys.exit(0 if ok else 1)
+PY
+then
+  echo "Sample run matches AFRL's expected output."
+else
+  echo "Sample run differs from AFRL's expected output: compare $test_dir" >&2
+  exit 1
+fi
+rm -rf "$test_dir"
+echo "Installed IRENE $version at $prefix; 'irene -i <input>' runs it."

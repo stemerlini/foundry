@@ -8,7 +8,7 @@ from foundry.modules.api import Toolchain
 
 def test_registry_has_builtins():
     mods = registry.all_modules()
-    assert {"core", "script", "geant4", "pic", "ngspice", "kicad", "freecad",
+    assert {"core", "script", "geant4", "irene", "pic", "ngspice", "kicad", "freecad",
             "software"} <= set(mods)
     assert {"system", "generic", "electronics", "mechanical", "software"} <= set(registry.kinds())
     assert registry.kind("nonsense").id == "generic"
@@ -68,3 +68,4 @@ def test_viewer_lookup(tmp_path, monkeypatch):
     assert registry.viewer_for(Path("head.step")).id == "f3d"
     assert registry.viewer_for(Path("plot.png")).id == "image"
     assert registry.viewer_for(Path("notes.txt")) is None
+
